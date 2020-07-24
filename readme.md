@@ -8,6 +8,7 @@
 - Maven
 - MyBatis
 - MySQL
+- IDEA
 
 ## Tips
 1. 为防止层与层之间的数据透传，每一层最好自己定义数据对象模型。
@@ -21,3 +22,36 @@
 
 ### 业务模型之Service层设计
 
+#### 用户模型管理
+##### 1.1 注册短信验证码获取
+通过定义getOpt方法处理前端提交的请求，该方法需要处理的逻辑如下
+
+```java
+public ReturnType getOpt(@RequestParam(name="telephone") String telephone){
+	//按照一定规则生成验证码
+	//将Opt验证码同用户手机号关联，一般采用Redis，此处先采用HttpSession实现
+	httpServeletRequest.getSession.setAttribute(telephone, optCode);
+	//将验证码通过短信通道发送给用户
+}
+```
+
+此处的HttpSession可以通过自动装载`HttpServletRequest`（单例）得到，此处之所以可以存储多个用户信息，是由于其内部采用Threalocal实现多线程绑定，使得每个用户的先短信验证信息隔离。
+##### 1.2 前端页面简易处理
+通过javascript响应事件，后端收到post请求时，调动getOpt方法进行处理。此处针对后端代码需要做如下处理：
+1. 完善RequestMapping注解的参数；
+```java
+@RequestMapping(value = "/getOtp", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+```
+2. 加入跨域请求注解`@CrossOrigin`，加到`UserController`类上，加载到方法getOpt上会依然报错（后来被验证无效，在方法上加与不加一样），但是可以与后端产生交互；
+```java
+//不设置参数的话，依然无法避免
+@CrossOrigin(allowCredentials = "true", allowedHeaders = "*")
+```
+##### 2.1 注册功能实现
+```java
+public ReturnType register(//@RequestParam获取前端传入的数据){
+	// 1.验证用户的手机号与验证码符合
+	// 2.进入注册流程，分层设计
+	// 3.返回注册成功信息
+}
+```

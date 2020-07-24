@@ -6,15 +6,17 @@ import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.Model.UserModel;
 import com.miaoshaproject.service.UserService;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Random;
 
 @Controller("user")
 @RequestMapping("/user")
+@CrossOrigin(allowCredentials = "true", allowedHeaders = "*")
 public class UserController extends BaseController {
     @Autowired
     private UserService userService;
@@ -40,5 +42,23 @@ public class UserController extends BaseController {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
+    }
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
+    @RequestMapping(value="/getotp",method={RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType getOpt(@RequestParam("telphone") String tel){
+        //1.生成随机验证码
+        Random random = new Random();
+        int randomInt = random.nextInt(99999);
+        randomInt += 100000;
+        String OptCode = String.valueOf(randomInt);
+        //2.将OptCode和Tel关联
+        httpServletRequest.getSession().setAttribute(tel, OptCode);
+        //3. 通过短信通道发送给用户
+        System.out.println("optCode:" + OptCode);
+        return CommonReturnType.create(null);
     }
 }

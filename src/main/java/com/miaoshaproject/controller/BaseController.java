@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseController {
+    public static final String CONTENT_TYPE_FORMED="application/x-www-form-urlencoded";
     //每一个Controller都需要有异常处理模块
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
