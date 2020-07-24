@@ -1,5 +1,6 @@
 package com.miaoshaproject.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.miaoshaproject.controller.Model.UserVO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
@@ -11,7 +12,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 @Controller("user")
@@ -58,7 +63,40 @@ public class UserController extends BaseController {
         //2.将OptCode和Tel关联
         httpServletRequest.getSession().setAttribute(tel, OptCode);
         //3. 通过短信通道发送给用户
-        System.out.println("optCode:" + OptCode);
+        System.out.println("Telephone:"+ tel + " optCode:" + OptCode);
         return CommonReturnType.create(null);
     }
+
+    @RequestMapping(value="/register",method={RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType register(@RequestParam("name") String name, @RequestParam("gender") Byte gender,
+                                     @RequestParam("age") Integer age, @RequestParam("telphone") String tel,
+                                     @RequestParam("password") String encrptPassword,
+                                     @RequestParam("otpCode") String optCode) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        // 1.验证用户的手机号与验证码是否匹配
+        String optCodeInSession = (String) httpServletRequest.getSession().getAttribute(tel);
+        if(!StringUtils.equals(optCodeInSession, optCode))
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "短信验证码不符合");
+        // 2.用户注册流程
+        UserModel userModel = new UserModel();
+        userModel.setName(name);
+        userModel.setGender(gender);
+        userModel.setAge(age);
+        userModel.setTelephone(tel);
+        userModel.setEncrptPassword(this.EncodeByMd5(encrptPassword));
+
+        //调用Service层方法进行注册
+        userService.register(userModel);
+        return CommonReturnType.create(null);
+    }
+
+    public String EncodeByMd5(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        //确定计算方法
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        BASE64Encoder base64en = new BASE64Encoder();
+        //加密字符串
+        String newstr = base64en.encode(md5.digest(str.getBytes("utf-8")));
+        return newstr;
+    }
+
 }

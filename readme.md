@@ -1,6 +1,6 @@
 ## One SecKill Project
 
-一个基于SpringBoot搭建的秒杀项目，整体框架基于Data Access Object (DAO) -> Service -> Controller结构设计（本项目来源于慕课网免费课程）
+一个基于SpringBoot搭建的秒杀项目:rocket:，整体框架基于Data Access Object (DAO) -> Service -> Controller结构设计（本项目来源于慕课网免费课程）
 
 ## 技术基础
 
@@ -55,3 +55,6 @@ public ReturnType register(//@RequestParam获取前端传入的数据){
 	// 3.返回注册成功信息
 }
 ```
+用户自增id不需要传入值，非自增字段，且没有设置默认值会导致mybatis报错。
+
+为避免相同手机号多次注册，可以将telephone字段设为唯一索引。
