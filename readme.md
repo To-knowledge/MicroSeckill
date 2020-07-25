@@ -58,3 +58,44 @@ public ReturnType register(//@RequestParam获取前端传入的数据){
 用户自增id不需要传入值，非自增字段，且没有设置默认值会导致mybatis报错。
 
 为避免相同手机号多次注册，可以将telephone字段设为唯一索引。
+
+##### 3.1 登录功能实现
+主要涉及通过用户手机号获取用户信息，需要在UserDOMapper.xml中加入相关的数据库查询代码，如下：
+```xml
+<select id="selectByTelephone" resultMap="BaseResultMap">
+select
+<include refid="Base_Column_List"/>
+from user_info
+where telephone = #{telephone, jdbcType=VARCHAR}
+</select>
+```
+然后，在UserDO.java中加入对应的方法：
+```java
+UserDO selectByTelephone(String telephone);
+```
+验证成功后，将登录凭证加入到用户登录成功的session内。
+#### 校验规则优化
+1. 调用Maven仓库中的Hibernate Validator Engine中的模块；
+2. 通过@NotBlank、@NotNull、@Max、@Min注解约束参数的范围
+
+#### 商品模型设计
+优先设计领域模型（不能一上来就去数据库建表）
+领域模型
+```java
+public class ItemModel{
+	// id字段
+	private Integer id;
+	//商品名称
+	private String title;
+	//价格
+	private BigDecimal price;
+	//库存
+	private Integer stock;
+	//商品描述
+	private String description;
+	//商品销量
+	private Integer sales;
+	//商品图片url
+	private String url;
+}
+```

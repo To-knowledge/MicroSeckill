@@ -1,9 +1,19 @@
 package com.miaoshaproject.service.Model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class UserModel {
     private Integer id;
+    @NotBlank(message = "用户名不能为空")
     private String name;
     private Byte gender;
+
+    @NotNull(message = "年龄不能为空")
+    @Min(value=0, message = "年龄不合法")
+    @Max(value=150,message = "年龄不合法")
     private Integer age;
     private String telephone;
     private String registerMode;

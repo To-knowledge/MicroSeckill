@@ -63,6 +63,22 @@ public class UserServiceImpl  implements UserService {
 
     }
 
+    @Override
+    public UserModel validateLogin(String tel, String encrptPassword) throws BusinessException {
+        UserModel userModel = new UserModel();
+        // 1.通过手机号拿到UserDO对象
+        UserDO userDO = userDOMapper.selectByTelephone(tel);
+        if(userDO == null)
+            throw new BusinessException(EmBusinessError.LOGIN_ERROR);
+        // 2.比对密码
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+        if(!StringUtils.equals(userPasswordDO.getEncrptPassword(), encrptPassword))
+            throw new BusinessException(EmBusinessError.LOGIN_ERROR);
+        BeanUtils.copyProperties(userDO,userModel);
+        userModel.setEncrptPassword(userPasswordDO.getEncrptPassword());
+        return userModel;
+    }
+
     private UserPasswordDO convertPasswordFromUserModel(UserModel userModel) {
         UserPasswordDO userPasswordDO = new UserPasswordDO();
         //BeanUtils.copyProperties(userModel, userPasswordDO);

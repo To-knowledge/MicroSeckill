@@ -7,6 +7,8 @@ import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.response.CommonReturnType;
 import com.miaoshaproject.service.Model.UserModel;
 import com.miaoshaproject.service.UserService;
+import com.miaoshaproject.validator.ValidationResult;
+import com.miaoshaproject.validator.ValidatorImpl;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +87,34 @@ public class UserController extends BaseController {
         userModel.setTelephone(tel);
         userModel.setEncrptPassword(this.EncodeByMd5(encrptPassword));
 
+        ValidationResult validationResult = validator.validate(userModel);
+        if(validationResult.isHasErrors()){
+            String error = validationResult.getErrMsg();
+            BusinessException ex = new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, error);
+            throw ex;
+        }
         //调用Service层方法进行注册
         userService.register(userModel);
+        return CommonReturnType.create(null);
+    }
+
+    @Autowired
+    ValidatorImpl validator;
+
+    @RequestMapping(value="/login",method={RequestMethod.POST},consumes={CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam("telphone") String tel,
+                                  @RequestParam("password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        // 1.判空
+        if(org.apache.commons.lang3.StringUtils.isEmpty(tel)
+        || org.apache.commons.lang3.StringUtils.isEmpty(password))
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        // 2.验证
+        UserModel userModel = userService.validateLogin(tel, this.EncodeByMd5(password));
+        // 3.将用户加入到session中
+        httpServletRequest.getSession().setAttribute("is_login", true);
+        httpServletRequest.getSession().setAttribute("loginUser",userModel);
+
         return CommonReturnType.create(null);
     }
 
