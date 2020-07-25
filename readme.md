@@ -99,3 +99,28 @@ public class ItemModel{
 	private String url;
 }
 ```
+根据领域模型合理分表，创建对应表结构，最后通过mybatis-generator生成DOMapper.xml、DOMapper的java接口、DO类。
+
+此处分出了两张表，一张商品信息(item)表，一张库存(item_stock)表，~~修改DOMopper.xml使得item的id与item_stock中的item_id关联。~~（删除线中的内容对于这一关联操作，是通过java代码实现的，先取出item的id，然后把它赋值给item_stock表的item_id字段）。
+```xml
+(ItemDOMapper.xml以及ItemStockMapper.xml)
+(找到insert操作以及insertSelective操作) userGenertedKeys = "true" keyProperty = "id"(不是true) (此处的原因与id自增有关，既然如此，为何myBatis在设计的时候为啥不默认为true)(后来发现，如果不写，service层通过DO取不出来id值)
+```
+##### 商品的service层接口
+主要需要有创建商品、商品列表浏览、商品详情浏览等功能。
+```java
+ItemModel createItem(ItemModel itemModel);
+List<ItemModel> listItem();
+ItemModel getItemById(Integer id);
+```
+创建Item的方法设计流程：
+```java
+@Transactional 
+public ItemModel createItem(ItemModel itemModel){
+// 1.校验入参，通过先前定义的ValdationImpl实现
+// 2.转化itemModel -> dataObject
+// 3.写入数据库
+// 4.返回创建完成的对象
+// 注记：double在传到前端会有精度损失的问题，需要转化为BigDecmal
+}
+```
