@@ -4,8 +4,11 @@ public enum EmBusinessError implements CommonError {
     PARAMETER_VALIDATION_ERROR(10000, "参数不合法"),
     USER_NOT_EXIST(10001,"用户不存在"),
     UNKNOWN_ERROR(10002, "除去BusinessException之外的错误"),
-    LOGIN_ERROR(10003, "手机号或密码不正确")
+    LOGIN_ERROR(10003, "手机号或密码不正确"),
+    STOCK_NOT_ENOUGH(10004, "库存不足"),
+    USER_NOT_LOGIN(10005, "用户未登录")
     ;
+
 
     private int errCode;
     private String errMsg;

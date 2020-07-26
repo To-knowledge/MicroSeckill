@@ -112,8 +112,8 @@ public class UserController extends BaseController {
         // 2.验证
         UserModel userModel = userService.validateLogin(tel, this.EncodeByMd5(password));
         // 3.将用户加入到session中
-        httpServletRequest.getSession().setAttribute("is_login", true);
-        httpServletRequest.getSession().setAttribute("loginUser",userModel);
+        httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
+        httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
 
         return CommonReturnType.create(null);
     }
