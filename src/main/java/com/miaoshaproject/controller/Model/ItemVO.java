@@ -1,4 +1,4 @@
-package com.miaoshaproject.controller.Model;
+ package com.miaoshaproject.controller.Model;
 
 import java.math.BigDecimal;
 

@@ -106,6 +106,7 @@ public class ItemModel{
 (ItemDOMapper.xml以及ItemStockMapper.xml)
 (找到insert操作以及insertSelective操作) userGenertedKeys = "true" keyProperty = "id"(不是true) (此处的原因与id自增有关，既然如此，为何myBatis在设计的时候为啥不默认为true)(后来发现，如果不写，service层通过DO取不出来id值)
 ```
+
 ##### 商品的service层接口
 主要需要有创建商品、商品列表浏览、商品详情浏览等功能。
 ```java
@@ -197,3 +198,18 @@ OrderModel createOrder(用户, 商品, 数量){
     where name = #{name,jdbcType=VARCHAR}
   </update>
   ```
+
+#### 秒杀模型(PromoModel)
+Field : id; promoName; startDate; endDate; itemId;(秒杀活动适用商品)
+		promoItemPrice;
+时间模型使用Joda;
+
+秒杀活动与秒杀商品做**聚合**：将PromoModel聚合(嵌套)在ItemMOdel中。
+```java
+PromoModel promoModel = promoService.getPromoModel(itemModel.getId());
+if(promoModel != null && promoModel.getStatus().intValue() != 3)
+	itemModel.setPromoModel(promoModel);
+```
+
+将数据库中的double类型转化为BigDecimal类型。
+修改订单模型，在其中加入秒杀活动判断（通过前端传入的秒杀活动id判断是秒杀，还是平价）。

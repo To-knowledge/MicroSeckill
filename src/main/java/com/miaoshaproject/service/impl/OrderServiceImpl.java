@@ -55,15 +55,15 @@ public class OrderServiceImpl implements OrderService {
             }
 
             //校验活动信息
-//            if(promoId != null){
-//                //（1）校验对应活动是否存在这个适用商品
-//                if(promoId.intValue() != itemModel.getPromoModel().getId()){
-//                    throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动信息不正确");
-//                    //（2）校验活动是否正在进行中
-//                }else if(itemModel.getPromoModel().getStatus().intValue() != 2) {
-//                    throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动信息还未开始");
-//                }
-//            }
+            if(promoId != null){
+                //（1）校验对应活动是否存在这个适用商品
+                if(promoId.intValue() != itemModel.getPromoModel().getId()){
+                    throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动信息不正确");
+                    //（2）校验活动是否正在进行中
+                }else if(itemModel.getPromoModel().getStatus().intValue() != 2) {
+                    throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动信息还未开始");
+                }
+            }
 
             //2.落单减库存
             boolean result = itemService.decreaseStock(itemId,amount);
@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
             orderModel.setItemId(itemId);
             orderModel.setAmount(amount);
             if(promoId != null){
-                // orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
+                 orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
             }else{
                 orderModel.setItemPrice(itemModel.getPrice());
             }
